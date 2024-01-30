@@ -1,0 +1,25 @@
+services:
+  rclone:
+    command: >
+      -c "rclone copy $(find -not -path '*/.*' -name '*.kdbx' -type f) remote:;
+          apk add --no-cache gnupg &&
+          tar --create --file /tmp/Syncthing.tar [!config]* &&
+          gpg --batch --cipher-algo AES256 --output /tmp/Syncthing.tar.gpg --passphrase-file /config/rclone/gpg_passphrase.txt --symmetric /tmp/Syncthing.tar &&
+          rclone copy /tmp/Syncthing.tar.gpg remote:"
+    entrypoint: sh
+    image: rclone/rclone:latest
+    profiles:
+      - disabled
+    volumes:
+      - ./data-rclone:/config/rclone:Z
+      - ./data-syncthing:/data:ro,z
+
+  syncthing:
+    hostname: ${COMPOSE_PROJECT_NAME}
+    image: syncthing/syncthing:latest
+    ports:
+      - "8384:8384"
+      - "${SYNCTHING_PORT:?err}:22000"
+    restart: always
+    volumes:
+      - ./data-syncthing:/var/syncthing:z
