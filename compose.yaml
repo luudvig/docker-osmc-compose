@@ -1,4 +1,10 @@
 services:
+  ddclient:
+    image: linuxserver/ddclient:latest
+    restart: always
+    volumes:
+      - ./data-ddclient:/config:Z
+
   rclone:
     command: >
       -c "rclone copy $(find -not -path '*/.*' -name '*.kdbx' -type f) remote:;
