@@ -29,3 +29,19 @@ services:
     restart: always
     volumes:
       - ./data-syncthing:/var/syncthing:z
+
+  yt-dlp:
+    build:
+      dockerfile_inline: |
+        FROM alpine:latest
+        RUN apk add --no-cache ffmpeg python3 && \
+            wget -P /usr/local/bin https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp && \
+            chmod +x /usr/local/bin/yt-dlp
+        USER 1000:1000
+        WORKDIR /data
+        ENTRYPOINT ["yt-dlp"]
+    image: localhost/yt-dlp
+    profiles:
+      - disabled
+    volumes:
+      - ./data-ytdlp:/data:Z
