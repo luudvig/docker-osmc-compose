@@ -9,7 +9,7 @@ services:
     command: >
       -c "rclone copy $(find -not -path '*/.*' -name '*.kdbx' -type f) remote:;
           apk add --no-cache gnupg &&
-          tar --create --file /tmp/Syncthing.tar [!config]* &&
+          tar --create --exclude-from Sync/tar-exclude.txt --file /tmp/Syncthing.tar . &&
           gpg --batch --cipher-algo AES256 --output /tmp/Syncthing.tar.gpg --passphrase-file /config/rclone/gpg_passphrase.txt --symmetric /tmp/Syncthing.tar &&
           rclone copy /tmp/Syncthing.tar.gpg remote:"
     entrypoint: sh
